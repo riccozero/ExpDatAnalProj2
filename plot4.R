@@ -6,25 +6,14 @@ SCC <- readRDS("Source_Classification_Code.rds")
 library(stringr)
 ind <- !is.na(str_locate(SCC$SCC.Level.One,"Combustion")[,1]) & !is.na(str_locate(SCC$SCC.Level.Three,"Coal")[,1])
 
-CoalCombSource <- SCC[ind,]
+CoalCombSource <- SCC[ind,1]
 
-# CoalCombSource <- transform(CoalCombSource, SCC = as.numeric(SCC))
+# selecting only readings from Coal Combustion Sources
 
-IsCoalCombSource <- function(x,z){
-    y <- rep(FALSE, length(x))
-    for (i in z){y <- y | (x==i)}
-    y
-}
-
-indx <- IsCoalCombSource(NEI$SCC,CoalCombSource$SCC)
-
-NEIC <- NEI[indx,]
-
+NEIC <- subset(NEI, SCC %in% CoalCombSource)
 NEIC <- transform(NEIC, year=as.factor(year))
 
-
-
-png("plot4.png", width=640, height=640)
+png("plot4.png", width=640, height=480)
 
 boxplot(Emissions ~ year, data=NEIC, ylim=c(0,5))
 title(ylab = expression(PM[2.5]),
