@@ -1,28 +1,14 @@
 NEI <- readRDS("summarySCC_PM25.rds")
 SCC <- readRDS("Source_Classification_Code.rds")
 
-NEIBaltimore <- NEI[NEI$fips==24510,]
+NEIBaltimore <- subset(NEI, fips==24510)
 
-# locating all sources related to Coal Combustion
+# locating all sources related to Vehicular Traffic
 
 library(stringr)
-ind <- !is.na(str_locate(SCC$SCC.Level.Two,"Highway Vehicle")[,1])
+MV <- SCC[!is.na(str_locate(SCC$SCC.Level.Two,"Highway Vehicle")[,1]),1]
 
-MV <- SCC[ind,]
-
-IsMV <- function(x,z){
-    y <- rep(FALSE, length(x))
-    for (i in z){y <- y | (x==i)}
-    y
-}
-
-
-
-
-indx <- IsMV(NEIBaltimore$SCC,MV$SCC)
-
-NEIBaltimore <- NEIBaltimore[indx,]
-
+NEIBaltimore <- subset(NEIBaltimore, SCC %in% MV)
 NEIBaltimore <- transform(NEIBaltimore, year=as.factor(year))
 
 

@@ -1,41 +1,21 @@
 NEI <- readRDS("summarySCC_PM25.rds")
 SCC <- readRDS("Source_Classification_Code.rds")
 
-NEIBaltimore <- NEI[NEI$fips=="24510",]
-
-# locating all sources related to Coal Combustion
+# locating all sources related to Vehicular Traffic
 
 library(stringr)
-ind <- !is.na(str_locate(SCC$SCC.Level.Two,"Highway Vehicle")[,1])
-
-MV <- SCC[ind,]
-
-IsMV <- function(x,z){
-    y <- rep(FALSE, length(x))
-    for (i in z){y <- y | (x==i)}
-    y
-}
+MV <- SCC[!is.na(str_locate(SCC$SCC.Level.Two,"Highway Vehicle")[,1]),1]
 
 
+# locating all readings from Baltimore and LA County from MV
 
-
-indx <- IsMV(NEIBaltimore$SCC,MV$SCC)
-
-NEIBaltimore <- NEIBaltimore[indx,]
-
+NEIBaltimore <- subset(NEI, fips=="24510" & SCC %in% MV)
 NEIBaltimore <- transform(NEIBaltimore, fips="Baltimore", year=as.factor(year))
 
-
-
-
-NEILA <- NEI[NEI$fips=="06037",]
-indx <- IsMV(NEILA$SCC,MV$SCC)
-NEILA <- NEILA[indx,]
+NEILA <- subset(NEI, fips=="06037" & SCC %in% MV)
 NEILA <- transform(NEILA, fips="Los Angeles County", year=as.factor(year))
 
 NEIComb <- rbind(NEIBaltimore, NEILA)
-
-
 
 library(ggplot2)
 plt6 <- ggplot(NEIComb, aes(year, Emissions))
