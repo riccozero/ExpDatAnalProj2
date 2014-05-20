@@ -1,8 +1,9 @@
 NEI <- readRDS("summarySCC_PM25.rds")
-NEI <- transform(NEI,  
+
+NEIBaltimore <- subset(NEI,fips=="24510")
+NEIBaltimore <- transform(NEIBaltimore,  
                  year=as.factor(year),
                  type=as.factor(type))
-NEIBaltimore <- NEI[NEI$fip=="24510",]
 
 
 ### Question 3
